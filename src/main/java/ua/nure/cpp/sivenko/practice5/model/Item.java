@@ -18,7 +18,7 @@ public class Item {
     private BigDecimal marketPriceMin;
     private ItemStatus itemStatus;
 
-    enum ItemStatus {
+    public enum ItemStatus {
         PAWNED, REDEEMED, PAWNSHOP_PROPERTY;
 
         public String toString() {

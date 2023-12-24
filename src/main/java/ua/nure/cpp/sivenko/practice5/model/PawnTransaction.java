@@ -23,7 +23,7 @@ public class PawnTransaction {
     private LocalDate expirationDate;
     private TransactionStatus transactionStatus;
 
-    enum TransactionStatus {
+    public enum TransactionStatus {
         ACTIVE, REPAID, EXPIRED;
 
         public String toString() {
