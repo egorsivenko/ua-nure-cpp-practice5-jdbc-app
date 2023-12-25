@@ -1,15 +1,15 @@
 package ua.nure.cpp.sivenko.practice5.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class PawnTransaction {
     private long transactionId;
     private long customerId;

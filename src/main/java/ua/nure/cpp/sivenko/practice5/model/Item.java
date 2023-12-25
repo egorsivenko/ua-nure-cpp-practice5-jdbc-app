@@ -1,14 +1,14 @@
 package ua.nure.cpp.sivenko.practice5.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class Item {
     private long itemId;
     private String itemName;

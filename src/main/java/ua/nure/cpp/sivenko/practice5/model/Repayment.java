@@ -1,14 +1,14 @@
 package ua.nure.cpp.sivenko.practice5.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class Repayment {
     private long repaymentId;
     private long transactionId;

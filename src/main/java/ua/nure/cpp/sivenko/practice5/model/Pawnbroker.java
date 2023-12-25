@@ -1,19 +1,19 @@
 package ua.nure.cpp.sivenko.practice5.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class Pawnbroker {
     private long pawnbrokerId;
-    private String firstname;
-    private String lastname;
+    private String firstName;
+    private String lastName;
     private LocalDate birthdate;
     private String contactNumber;
     private String email;
