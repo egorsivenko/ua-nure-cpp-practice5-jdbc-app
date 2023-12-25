@@ -8,7 +8,7 @@ public interface ItemCategoryDAO {
     ItemCategory getItemCategoryById(long itemCategoryId);
     List<ItemCategory> getAllItemCategories();
 
-    void addItemCategory(String itemCategoryName);
+    void addItemCategory(ItemCategory itemCategory);
     void updateItemCategoryName(long itemCategoryId, String itemCategoryName);
     void deleteItemCategory(long itemCategoryId);
 }

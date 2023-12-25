@@ -3,6 +3,7 @@ package ua.nure.cpp.sivenko.practice5.dao.mysql;
 import ua.nure.cpp.sivenko.practice5.ConnectionFactory;
 import ua.nure.cpp.sivenko.practice5.dao.ItemCategoryDAO;
 import ua.nure.cpp.sivenko.practice5.model.ItemCategory;
+import ua.nure.cpp.sivenko.practice5.model.Pawnbroker;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ public class ItemCategoryDAOMySQLImpl implements ItemCategoryDAO {
     private static final String UPDATE = "UPDATE item_categories " +
             "SET item_category_name = ? WHERE item_category_id = ?";
     private static final String DELETE = "DELETE FROM item_categories WHERE item_category_id = ?";
+
+    private static final String INSERT_PAWNBROKER_SPECIALIZATION = "INSERT INTO pawnbroker_specialization VALUES (?, ?)";
 
     @Override
     public ItemCategory getItemCategoryById(long itemCategoryId) {
@@ -55,12 +58,25 @@ public class ItemCategoryDAOMySQLImpl implements ItemCategoryDAO {
     }
 
     @Override
-    public void addItemCategory(String itemCategoryName) {
+    public void addItemCategory(ItemCategory itemCategory) {
         try (Connection connection = ConnectionFactory.createMySQLConnection();
-             PreparedStatement ps = connection.prepareStatement(INSERT)) {
-            ps.setString(1, itemCategoryName);
+             PreparedStatement ps = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement ps_pawn_spec = connection.prepareStatement(INSERT_PAWNBROKER_SPECIALIZATION)) {
+            ps.setString(1, itemCategory.getItemCategoryName());
 
             ps.executeUpdate();
+
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    for (Pawnbroker pawnbroker : itemCategory.getActivePawnbrokers()) {
+                        long pawnbrokerId = pawnbroker.getPawnbrokerId();
+                        ps_pawn_spec.setLong(1, pawnbrokerId);
+                        ps_pawn_spec.setLong(2, keys.getLong(1)); // itemCategoryId
+
+                        ps_pawn_spec.executeUpdate();
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

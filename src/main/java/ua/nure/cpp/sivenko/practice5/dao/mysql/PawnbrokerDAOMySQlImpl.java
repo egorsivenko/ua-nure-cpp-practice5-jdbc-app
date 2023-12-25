@@ -2,6 +2,7 @@ package ua.nure.cpp.sivenko.practice5.dao.mysql;
 
 import ua.nure.cpp.sivenko.practice5.ConnectionFactory;
 import ua.nure.cpp.sivenko.practice5.dao.PawnbrokerDAO;
+import ua.nure.cpp.sivenko.practice5.model.ItemCategory;
 import ua.nure.cpp.sivenko.practice5.model.Pawnbroker;
 
 import java.sql.*;
@@ -19,6 +20,8 @@ public class PawnbrokerDAOMySQlImpl implements PawnbrokerDAO {
     private static final String UPDATE = "UPDATE pawnbrokers " +
             "SET first_name = ?, last_name = ?, birthdate = ?, contact_number = ?, email = ?, address = ? WHERE pawnbroker_id = ?";
     private static final String DELETE = "DELETE FROM pawnbrokers WHERE pawnbroker_id = ?";
+
+    private static final String INSERT_PAWNBROKER_SPECIALIZATION = "INSERT INTO pawnbroker_specialization VALUES (?, ?)";
 
     @Override
     public Pawnbroker getPawnbrokerById(long pawnbrokerId) {
@@ -102,7 +105,8 @@ public class PawnbrokerDAOMySQlImpl implements PawnbrokerDAO {
     @Override
     public void addPawnbroker(Pawnbroker pawnbroker) {
         try (Connection connection = ConnectionFactory.createMySQLConnection();
-             PreparedStatement ps = connection.prepareStatement(INSERT)) {
+             PreparedStatement ps = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement ps_pawn_spec = connection.prepareStatement(INSERT_PAWNBROKER_SPECIALIZATION)) {
             ps.setString(1, pawnbroker.getFirstName());
             ps.setString(2, pawnbroker.getLastName());
             ps.setDate(3, Date.valueOf(pawnbroker.getBirthdate()));
@@ -111,6 +115,18 @@ public class PawnbrokerDAOMySQlImpl implements PawnbrokerDAO {
             ps.setString(6, pawnbroker.getAddress());
 
             ps.executeUpdate();
+
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    for (ItemCategory itemCategory : pawnbroker.getSpecializations()) {
+                        long itemCategoryId = itemCategory.getItemCategoryId();
+                        ps_pawn_spec.setLong(1, keys.getLong(1)); // pawnbrokerId
+                        ps_pawn_spec.setLong(2, itemCategoryId);
+
+                        ps_pawn_spec.executeUpdate();
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
