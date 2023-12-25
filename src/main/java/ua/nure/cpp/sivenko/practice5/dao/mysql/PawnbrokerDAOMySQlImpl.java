@@ -1,6 +1,6 @@
 package ua.nure.cpp.sivenko.practice5.dao.mysql;
 
-import ua.nure.cpp.sivenko.practice5.ConnectionFactory;
+import ua.nure.cpp.sivenko.practice5.util.ConnectionFactory;
 import ua.nure.cpp.sivenko.practice5.dao.PawnbrokerDAO;
 import ua.nure.cpp.sivenko.practice5.model.ItemCategory;
 import ua.nure.cpp.sivenko.practice5.model.Pawnbroker;

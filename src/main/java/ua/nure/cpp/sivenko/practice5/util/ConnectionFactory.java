@@ -1,4 +1,4 @@
-package ua.nure.cpp.sivenko.practice5;
+package ua.nure.cpp.sivenko.practice5.util;
 
 import lombok.experimental.UtilityClass;
 
