@@ -9,6 +9,6 @@ public interface PaymentMethodDAO {
     List<PaymentMethod> getAllPaymentMethods();
 
     void addPaymentMethod(String paymentMethodName);
-    void updatePaymentMethod(long paymentMethodId, String paymentMethodName);
+    void updatePaymentMethodName(long paymentMethodId, String paymentMethodName);
     void deletePaymentMethod(long paymentMethodId);
 }

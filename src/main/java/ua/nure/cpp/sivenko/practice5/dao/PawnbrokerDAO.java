@@ -5,7 +5,7 @@ import ua.nure.cpp.sivenko.practice5.model.Pawnbroker;
 import java.util.List;
 
 public interface PawnbrokerDAO {
-    Pawnbroker getPawnbrokerById(long customerId);
+    Pawnbroker getPawnbrokerById(long pawnbrokerId);
     Pawnbroker getPawnbrokerByContactNumber(String contactNumber);
     Pawnbroker getPawnbrokerByEmail(String email);
     List<Pawnbroker> getAllPawnbrokers();

@@ -11,5 +11,4 @@ public interface RepaymentDAO {
     List<Repayment> getAllRepayments();
 
     void addRepayment(Repayment repayment);
-    void deleteRepayment(long repaymentId);
 }
