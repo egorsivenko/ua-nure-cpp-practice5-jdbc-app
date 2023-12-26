@@ -1,6 +1,7 @@
-package ua.nure.cpp.sivenko.practice5.dao.collection;
+package ua.nure.cpp.sivenko.practice5.dao.factory;
 
 import ua.nure.cpp.sivenko.practice5.dao.*;
+import ua.nure.cpp.sivenko.practice5.dao.collection.*;
 
 public final class CollectionDAOFactory implements DAOFactory {
     private CustomerDAO customerDAO;

@@ -1,4 +1,6 @@
-package ua.nure.cpp.sivenko.practice5.dao;
+package ua.nure.cpp.sivenko.practice5.dao.factory;
+
+import ua.nure.cpp.sivenko.practice5.dao.*;
 
 public interface DAOFactory {
     CustomerDAO getCustomerDAO();

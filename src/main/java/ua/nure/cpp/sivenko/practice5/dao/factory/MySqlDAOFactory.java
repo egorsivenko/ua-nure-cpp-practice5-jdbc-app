@@ -1,6 +1,7 @@
-package ua.nure.cpp.sivenko.practice5.dao.mysql;
+package ua.nure.cpp.sivenko.practice5.dao.factory;
 
 import ua.nure.cpp.sivenko.practice5.dao.*;
+import ua.nure.cpp.sivenko.practice5.dao.mysql.*;
 
 public final class MySqlDAOFactory implements DAOFactory {
     private CustomerDAO customerDAO;
