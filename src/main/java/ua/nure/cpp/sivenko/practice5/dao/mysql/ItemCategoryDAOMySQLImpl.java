@@ -18,22 +18,29 @@ public class ItemCategoryDAOMySQLImpl implements ItemCategoryDAO {
             "SET item_category_name = ? WHERE item_category_id = ?";
     private static final String DELETE = "DELETE FROM item_categories WHERE item_category_id = ?";
 
+    private static final String SELECT_PAWNBROKER_SPECIALIZATION = "SELECT * FROM pawnbroker_specialization ps " +
+            "JOIN pawnbrokers p ON ps.pawnbroker_id = p.pawnbroker_id WHERE specialization = ?";
     private static final String INSERT_PAWNBROKER_SPECIALIZATION = "INSERT INTO pawnbroker_specialization VALUES (?, ?)";
+    private static final String DELETE_PAWNBROKER_SPECIALIZATION = "DELETE FROM pawnbroker_specialization WHERE specialization = ?";
 
     @Override
     public ItemCategory getItemCategoryById(long itemCategoryId) {
         if (itemCategoryId < 1) {
             throw new IllegalArgumentException("ItemCategory id cannot be <= 0");
         }
-        try (Connection connection = ConnectionFactory.createMySQLConnection();
-             PreparedStatement ps = connection.prepareStatement(GET_BY_ID)) {
-            ps.setLong(1, itemCategoryId);
+        try (Connection connection = ConnectionFactory.createMySQLConnection()) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) {
-                    return null;
+            try (PreparedStatement ps = connection.prepareStatement(GET_BY_ID);
+                 PreparedStatement ps_pawn_spec = connection.prepareStatement(SELECT_PAWNBROKER_SPECIALIZATION)) {
+                ps.setLong(1, itemCategoryId);
+                ItemCategory itemCategory = getItemCategory(ps);
+
+                if (itemCategory != null) {
+                    ps_pawn_spec.setLong(1, itemCategoryId);
+                    itemCategory.setActivePawnbrokers(getActivePawnbrokers(ps_pawn_spec));
                 }
-                return mapItemCategory(rs);
+                return itemCategory;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -44,11 +51,20 @@ public class ItemCategoryDAOMySQLImpl implements ItemCategoryDAO {
     public List<ItemCategory> getAllItemCategories() {
         List<ItemCategory> itemCategories = new ArrayList<>();
 
-        try (Connection connection = ConnectionFactory.createMySQLConnection();
-             Statement st = connection.createStatement()) {
-            try (ResultSet rs = st.executeQuery(GET_ALL)) {
+        try (Connection connection = ConnectionFactory.createMySQLConnection()) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+
+            try (Statement st = connection.createStatement();
+                 PreparedStatement ps_pawn_spec = connection.prepareStatement(SELECT_PAWNBROKER_SPECIALIZATION);
+                 ResultSet rs = st.executeQuery(GET_ALL)) {
+
                 while (rs.next()) {
-                    itemCategories.add(mapItemCategory(rs));
+                    ItemCategory itemCategory = mapItemCategory(rs);
+
+                    ps_pawn_spec.setLong(1, itemCategory.getItemCategoryId());
+                    itemCategory.setActivePawnbrokers(getActivePawnbrokers(ps_pawn_spec));
+
+                    itemCategories.add(itemCategory);
                 }
             }
         } catch (SQLException e) {
@@ -59,23 +75,31 @@ public class ItemCategoryDAOMySQLImpl implements ItemCategoryDAO {
 
     @Override
     public void addItemCategory(ItemCategory itemCategory) {
-        try (Connection connection = ConnectionFactory.createMySQLConnection();
-             PreparedStatement ps = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement ps_pawn_spec = connection.prepareStatement(INSERT_PAWNBROKER_SPECIALIZATION)) {
-            ps.setString(1, itemCategory.getItemCategoryName());
+        try (Connection connection = ConnectionFactory.createMySQLConnection()) {
+            connection.setAutoCommit(false);
 
-            ps.executeUpdate();
+            try (PreparedStatement ps = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement ps_pawn_spec = connection.prepareStatement(INSERT_PAWNBROKER_SPECIALIZATION)) {
+                ps.setString(1, itemCategory.getItemCategoryName());
 
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    for (Pawnbroker pawnbroker : itemCategory.getActivePawnbrokers()) {
-                        long pawnbrokerId = pawnbroker.getPawnbrokerId();
-                        ps_pawn_spec.setLong(1, pawnbrokerId);
-                        ps_pawn_spec.setLong(2, keys.getLong(1)); // itemCategoryId
+                ps.executeUpdate();
 
-                        ps_pawn_spec.executeUpdate();
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        for (Pawnbroker pawnbroker : itemCategory.getActivePawnbrokers()) {
+                            long pawnbrokerId = pawnbroker.getPawnbrokerId();
+                            ps_pawn_spec.setLong(1, pawnbrokerId);
+                            ps_pawn_spec.setLong(2, keys.getLong(1)); // itemCategoryId
+
+                            ps_pawn_spec.executeUpdate();
+                        }
                     }
                 }
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+            } finally {
+                connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -100,13 +124,34 @@ public class ItemCategoryDAOMySQLImpl implements ItemCategoryDAO {
         if (itemCategoryId < 1) {
             throw new IllegalArgumentException("ItemCategory id cannot be <= 0");
         }
-        try (Connection connection = ConnectionFactory.createMySQLConnection();
-             PreparedStatement ps = connection.prepareStatement(DELETE)) {
-            ps.setLong(1, itemCategoryId);
+        try (Connection connection = ConnectionFactory.createMySQLConnection()) {
+            connection.setAutoCommit(false);
 
-            ps.executeUpdate();
+            try (PreparedStatement ps = connection.prepareStatement(DELETE);
+                 PreparedStatement ps_pawn_spec = connection.prepareStatement(DELETE_PAWNBROKER_SPECIALIZATION)) {
+                ps_pawn_spec.setLong(1, itemCategoryId);
+                ps_pawn_spec.executeUpdate();
+
+                ps.setLong(1, itemCategoryId);
+                ps.executeUpdate();
+
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+            } finally {
+                connection.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private ItemCategory getItemCategory(PreparedStatement ps) throws SQLException {
+        try (ResultSet rs = ps.executeQuery()) {
+            if (!rs.next()) {
+                return null;
+            }
+            return mapItemCategory(rs);
         }
     }
 
@@ -115,5 +160,27 @@ public class ItemCategoryDAOMySQLImpl implements ItemCategoryDAO {
         itemCategory.setItemCategoryId(rs.getLong("item_category_id"));
         itemCategory.setItemCategoryName(rs.getString("item_category_name"));
         return itemCategory;
+    }
+
+    private List<Pawnbroker> getActivePawnbrokers(PreparedStatement ps) throws SQLException {
+        List<Pawnbroker> activePawnbrokers = new ArrayList<>();
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                activePawnbrokers.add(mapPawnbroker(rs));
+            }
+        }
+        return activePawnbrokers;
+    }
+
+    private Pawnbroker mapPawnbroker(ResultSet rs) throws SQLException {
+        Pawnbroker pawnbroker = new Pawnbroker();
+        pawnbroker.setPawnbrokerId(rs.getLong("pawnbroker_id"));
+        pawnbroker.setFirstName(rs.getString("first_name"));
+        pawnbroker.setLastName(rs.getString("last_name"));
+        pawnbroker.setBirthdate(rs.getDate("birthdate").toLocalDate());
+        pawnbroker.setContactNumber(rs.getString("contact_number"));
+        pawnbroker.setEmail(rs.getString("email"));
+        pawnbroker.setAddress(rs.getString("address"));
+        return pawnbroker;
     }
 }
