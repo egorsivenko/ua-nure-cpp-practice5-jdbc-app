@@ -14,8 +14,7 @@ public class RepaymentDAOMySQLImpl implements RepaymentDAO {
     private static final String GET_BY_PAYMENT_METHOD = "SELECT * FROM repayments WHERE payment_method = ?";
     private static final String GET_ALL = "SELECT * FROM repayments";
 
-    private static final String INSERT = "INSERT INTO repayments (transaction_id, payment_method) " +
-            "VALUES (?, ?)";
+    private static final String INSERT = "INSERT INTO repayments (transaction_id, payment_method) VALUES (?, ?)";
 
     @Override
     public Repayment getRepaymentById(long repaymentId) {
@@ -84,11 +83,10 @@ public class RepaymentDAOMySQLImpl implements RepaymentDAO {
         List<Repayment> repayments = new ArrayList<>();
 
         try (Connection connection = ConnectionFactory.createMySQLConnection();
-             Statement st = connection.createStatement()) {
-            try (ResultSet rs = st.executeQuery(GET_ALL)) {
-                while (rs.next()) {
-                    repayments.add(mapRepayment(rs));
-                }
+             Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(GET_ALL)) {
+            while (rs.next()) {
+                repayments.add(mapRepayment(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

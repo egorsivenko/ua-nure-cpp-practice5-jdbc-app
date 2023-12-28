@@ -156,6 +156,7 @@ public class PawnbrokerDAOMySQlImpl implements PawnbrokerDAO {
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
+                throw e;
             } finally {
                 connection.setAutoCommit(true);
             }
@@ -195,6 +196,7 @@ public class PawnbrokerDAOMySQlImpl implements PawnbrokerDAO {
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
+                throw e;
             } finally {
                 connection.setAutoCommit(true);
             }
@@ -222,6 +224,7 @@ public class PawnbrokerDAOMySQlImpl implements PawnbrokerDAO {
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
+                throw e;
             } finally {
                 connection.setAutoCommit(true);
             }

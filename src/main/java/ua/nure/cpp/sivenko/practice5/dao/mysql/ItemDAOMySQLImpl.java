@@ -1,9 +1,9 @@
 package ua.nure.cpp.sivenko.practice5.dao.mysql;
 
-import ua.nure.cpp.sivenko.practice5.util.ConnectionFactory;
 import ua.nure.cpp.sivenko.practice5.dao.ItemDAO;
 import ua.nure.cpp.sivenko.practice5.model.Item;
 import ua.nure.cpp.sivenko.practice5.model.Item.ItemStatus;
+import ua.nure.cpp.sivenko.practice5.util.ConnectionFactory;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -85,11 +85,10 @@ public class ItemDAOMySQLImpl implements ItemDAO {
         List<Item> items = new ArrayList<>();
 
         try (Connection connection = ConnectionFactory.createMySQLConnection();
-             Statement st = connection.createStatement()) {
-            try (ResultSet rs = st.executeQuery(GET_ALL)) {
-                while (rs.next()) {
-                    items.add(mapItem(rs));
-                }
+             Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(GET_ALL)) {
+            while (rs.next()) {
+                items.add(mapItem(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -86,11 +86,10 @@ public class PawnTransactionDAOMySQLImpl implements PawnTransactionDAO {
         List<PawnTransaction> pawnTransactions = new ArrayList<>();
 
         try (Connection connection = ConnectionFactory.createMySQLConnection();
-             Statement st = connection.createStatement()) {
-            try (ResultSet rs = st.executeQuery(GET_ALL)) {
-                while (rs.next()) {
-                    pawnTransactions.add(mapPawnTransaction(rs));
-                }
+             Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(GET_ALL)) {
+            while (rs.next()) {
+                pawnTransactions.add(mapPawnTransaction(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

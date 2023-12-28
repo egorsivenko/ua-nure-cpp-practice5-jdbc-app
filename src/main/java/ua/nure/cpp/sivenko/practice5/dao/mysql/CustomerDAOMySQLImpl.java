@@ -1,8 +1,8 @@
 package ua.nure.cpp.sivenko.practice5.dao.mysql;
 
-import ua.nure.cpp.sivenko.practice5.util.ConnectionFactory;
 import ua.nure.cpp.sivenko.practice5.dao.CustomerDAO;
 import ua.nure.cpp.sivenko.practice5.model.Customer;
+import ua.nure.cpp.sivenko.practice5.util.ConnectionFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -87,11 +87,10 @@ public class CustomerDAOMySQLImpl implements CustomerDAO {
         List<Customer> customers = new ArrayList<>();
 
         try (Connection connection = ConnectionFactory.createMySQLConnection();
-             Statement st = connection.createStatement()) {
-            try (ResultSet rs = st.executeQuery(GET_ALL)) {
-                while (rs.next()) {
-                    customers.add(mapCustomer(rs));
-                }
+             Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(GET_ALL)) {
+            while (rs.next()) {
+                customers.add(mapCustomer(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

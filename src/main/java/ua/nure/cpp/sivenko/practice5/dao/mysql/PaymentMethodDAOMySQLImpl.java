@@ -42,11 +42,10 @@ public class PaymentMethodDAOMySQLImpl implements PaymentMethodDAO {
         List<PaymentMethod> paymentMethods = new ArrayList<>();
 
         try (Connection connection = ConnectionFactory.createMySQLConnection();
-             Statement st = connection.createStatement()) {
-            try (ResultSet rs = st.executeQuery(GET_ALL)) {
-                while (rs.next()) {
-                    paymentMethods.add(mapPaymentMethod(rs));
-                }
+             Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(GET_ALL)) {
+            while (rs.next()) {
+                paymentMethods.add(mapPaymentMethod(rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
