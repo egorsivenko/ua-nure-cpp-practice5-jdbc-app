@@ -35,7 +35,7 @@ VALUES  (1, 3), (1, 5), (1, 6), (1, 12),
         (10, 2), (10, 5), (10, 11);
 
 INSERT INTO items (item_name, item_category, appraised_value)
-VALUES  ('Electronic Steel Fish', 13, '810.00'),
+VALUES  ('Electronic Steel Fish', 11, '810.00'),
 		('Handmade Soft Fish', 4, '527.00'),
         ('Unbranded Concrete Chips', 10, '851.00'),
         ('Sleek Fresh Chair', 12, '774.00'),
@@ -48,12 +48,12 @@ VALUES  ('Electronic Steel Fish', 13, '810.00'),
 
 INSERT INTO pawn_transactions (customer_id, item_id, pawnbroker_id, pawn_amount)
 VALUES  (1, 4, 8, '426.00'),
-		(5, 10, 2, '116.00'),
-        (8, 9, 2, '114.00'),
+		(5, 10, 4, '116.00'),
+        (8, 9, 6, '114.00'),
         (10, 6, 1, '376.00'),
-        (3, 4, 8, '461.00'),
-        (8, 8, 3, '140.00'),
-        (3, 1, 8, '390.00'),
-        (3, 8, 7, '132.00'),
-        (1, 6, 5, '353.00'),
-        (5, 9, 1, '117.00');
+        (3, 4, 9, '461.00'),
+        (8, 2, 2, '140.00'),
+        (3, 1, 10, '390.00'),
+        (3, 8, 8, '132.00'),
+        (1, 6, 1, '353.00'),
+        (5, 3, 6, '417.00');

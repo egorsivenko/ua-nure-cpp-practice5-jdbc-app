@@ -7,7 +7,7 @@ CREATE TABLE customers (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     contact_number VARCHAR(15) NOT NULL UNIQUE,
-    email VARCHAR(50) DEFAULT NULL
+    email VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE pawnbrokers (
@@ -17,7 +17,7 @@ CREATE TABLE pawnbrokers (
     birthdate DATE NOT NULL,
     contact_number VARCHAR(15) NOT NULL UNIQUE,
     email VARCHAR(50) NOT NULL UNIQUE,
-    address VARCHAR(255) DEFAULT NULL
+    address VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE item_categories (
@@ -58,7 +58,7 @@ CREATE TABLE pawn_transactions (
     monthly_period TINYINT NOT NULL DEFAULT 1,
     repayment_amount DECIMAL(9, 2) GENERATED ALWAYS AS (pawn_amount + (pawn_amount * interest_rate / 100 * monthly_period)) STORED,
     pawn_date DATE NOT NULL DEFAULT (CURDATE()),
-    expiration_date DATE GENERATED ALWAYS AS (DATE_ADD(pawn_date, INTERVAL 1 MONTH)) STORED,
+    expiration_date DATE GENERATED ALWAYS AS (DATE_ADD(pawn_date, INTERVAL monthly_period MONTH)) STORED,
     transaction_status ENUM('Active', 'Repaid', 'Expired') NOT NULL DEFAULT 'Active',
     FOREIGN KEY(customer_id) REFERENCES customers(customer_id),
     FOREIGN KEY(item_id) REFERENCES items(item_id),
